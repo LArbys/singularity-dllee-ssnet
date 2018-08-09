@@ -1,0 +1,94 @@
+Bootstrap: docker
+From: twongjirad/docker-caffe-larbys-dlee-ssnet
+
+%post
+  echo "START POST SCRIPT"
+  apt-get -y update
+  apt-get -y install vim wget perl python python-pip python-dev
+  apt-get autoremove -y
+  apt-get clean -y
+  mkdir -p /usr/local/larbys/modelfiles/
+  cp /tmp/segmentation_pixelwise_ikey_*.caffemodel /usr/local/larbys/modelfiles/
+  chmod a+r /usr/local/larbys/modelfiles/*
+  cp /tmp/dllee_ssnet2018.prototxt /usr/local/larbys/modelfiles/
+  cp -r /tmp/runscripts /usr/local/larbys/
+
+%environment
+  #source /usr/local/bin/thisroot.sh
+  #source /etc/larbys.sh
+  #cd /usr/local/larbys/ssnet_example/sw && source setup.sh
+  # ROOT
+  export ROOTSYS=/usr/local
+  export LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+  export PATH=/usr/local/lib:${PATH}
+  export ROOT_INCDIR=`$ROOTSYS/bin/root-config --incdir`
+  export ROOT_LIBDIR=`$ROOTSYS/bin/root-config --libdir`
+  export ROOT_BINDIR=`$ROOTSYS/bin/root-config --bindir`
+  # BOOST
+  export BOOST_INCDIR=/usr/local/include
+  export BOOST_LIBDIR=/usr/lib/x86_64-linux-gnu# BOOST
+  # OpenCV
+  export OPENCV_INCDIR=/usr/local/include
+  export OPENCV_LIBDIR=/usr/local/lib
+  # OpenBLAS
+  export OPENBLAS_INCDIR=/usr/include
+  export OPENBLAS_LIBDIR=/usr/lib
+  # protobuf
+  export PROTOBUF_INCDIR=/usr/include/google
+  export PROTOBUF_LIBDIR=/usr/lib/x86_64-linux-gnu
+  # glog
+  export GLOG_INCDIR=/usr/include/glog
+  export GLOG_LIBDIR=/usr/lib/x86_64-linux-gnu
+  # gflags
+  export GFLAGS_INCDIR=/usr/include/gflags
+  export GFLAGS_LIBDIR=/usr/lib/x86_64-linux-gnu
+  # hdf5
+  export HDF5_INCDIR=/usr/include/hdf5/serial
+  export HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu
+  export HDF5_BINDIR=/usr/bin
+  # leveldb
+  export LEVELDB_INCDIR=/usr/include
+  export LEVELDB_LIBDIR=/usr/lib/x86_64-linux-gnu
+  # lmdb
+  export LMDB_INCDIR=/usr/include
+  export LMDB_LIBDIR=/usr/lib/x86_64-linux-gnu
+  # cuda
+  export CUDA_INCDIR=/usr/local/cuda-8.0/targets/x86_64-linux/include
+  export CUDA_LIBDIR=/usr/local/cuda-8.0/targets/x86_64-linux/lib
+  # caffe
+  export CAFFE_DIR=/usr/local/larbys/ssnet_example/sw/caffe
+  export CAFFE_LIBDIR=${CAFFE_DIR}/build/lib
+  export CAFFE_INCDIR=${CAFFE_DIR}/build/include
+  export CAFFE_BINDIR=${CAFFE_DIR}/build/tools
+  # Set PATH and PYTHONPATH
+  export PATH=$CAFFE_BINDIR:$ROOT_BINDIR:$HDF5_BINDIR:$PATH
+  export PYTHONPATH=$ROOT_LIBDIR:${CAFFE_LIBDIR}:${CAFFE_DIR}/python:$PYTHONPATH
+  export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=$CAFFE_LIBDIR:$ROOT_LIBDIR:$OPENCV_LIBDIR:$QT_LIBDIR:$CUDA_LIBDIR:$LD_LIBRARY_PATH
+  export NUDOT_LARBYS_CONFIG=1
+  # Geo2D
+  export GEO2D_BASEDIR=/usr/local/larbys/ssnet_example/sw/geo2d/
+  export GEO2D_INCDIR=$GEO2D_BASEDIR
+  export GEO2D_LIBDIR=$GEO2D_BASEDIR/lib
+  export GEO2D_BINDIR=$GEO2D_BASEDIR/bin
+  export GEO2D_INCDIR=$GEO2D_BASEDIR
+  export GEO2D_COREDIR=$GEO2D_BASEDIR/Geo2D/core
+  export PATH=$GEO2D_BINDIR:$PATH
+  export LD_LIBRARY_PATH=$GEO2D_LIBDIR:$LD_LIBRARY_PATH
+  export PYTHONPATH=$GEO2D_BASEDIR/python:$PYTHONPATH
+  # larcv
+  export LARCV_BASEDIR=/usr/local/larbys/ssnet_example/sw/larcv
+  export LARCV_BUILDDIR=$LARCV_BASEDIR/build  
+  export LARCV_COREDIR=$LARCV_BASEDIR/core
+  export LARCV_APPDIR=$LARCV_BASEDIR/app
+  export LARCV_LIBDIR=$LARCV_BUILDDIR/lib
+  export LARCV_INCDIR=$LARCV_BUILDDIR/include
+  export LARCV_BINDIR=$LARCV_BUILDDIR/bin
+  export ANN_INCDIR=$LARCV_BASEDIR/app/ann_1.1.2/include
+  export ANN_LIBDIR=$LARCV_BASEDIR/app/ann_1.1.2/lib
+  export PATH=$LARCV_BASEDIR/bin:$LARCV_BINDIR:$PATH
+  export LD_LIBRARY_PATH=$LARCV_LIBDIR:$LD_LIBRARY_PATH
+  export PYTHONPATH=$LARCV_BASEDIR/python:$PYTHONPATH
+
+%runscript
+  /usr/local/larbys/runscripts/./run_ssnet_mcc8.py
